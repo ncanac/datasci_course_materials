@@ -1,9 +1,11 @@
 import sys
 import json
-import string
+import unicodedata
 
 def lines(fp):
     print str(len(fp.readlines()))
+
+RM_PUNC_TBL = dict.fromkeys(i for i in xrange(sys.maxunicode) if unicodedata.category(unichr(i)).startswith('P'))
 
 def calc_score(text, scores):
     """
@@ -12,9 +14,9 @@ def calc_score(text, scores):
     score = 0
     for word in text.split():
         # Convert characters to lowercase and strip punctuation
-        transdict = string.maketrans(string.punctuation, " "*len(string.punctuation))
-        word = word.translate(transdict)
-        score += scores[word.lower()] if word.lower() in scores else 0
+        word = word.translate(RM_PUNC_TBL)
+        word = word.lower()
+        score += scores[word] if word in scores else 0
     return score
 
 def assign_sent(tweet_data, scores):
