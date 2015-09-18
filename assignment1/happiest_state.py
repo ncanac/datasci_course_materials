@@ -67,6 +67,24 @@ STATE_ABBRV = { 'Alaska': 'AK',
 RM_PUNC_TBL = dict.fromkeys(i for i in xrange(sys.maxunicode) if
                             unicodedata.category(unichr(i)).startswith('P'))
 
+def contained_in(lat, lng, bound_coords):
+    """
+    Returns true if (lat, lng) is contained within the polygon formed by the
+    points in bound_coords.
+    """
+    bound_path = Path(np.array(bound_coords))
+    return bound_path.contains_point((lat, lng))
+
+def state_from_point(lat, lng, state_bounds):
+    """
+    Takes in a (latitude, longitude) point and returns the name of the state
+    where this point is located.
+    """
+    for state, bound_coords in state_bounds.iteritems():
+        if contained_in(lat, lng, bound_coords):
+            return state, True
+    return 'The Lost City of Atlantis', False
+
 def read_state_bounds():
     """
     Reads in the coordinates for the boundary of each state provided in the xml
