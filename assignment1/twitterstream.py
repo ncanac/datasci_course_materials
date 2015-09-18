@@ -1,12 +1,11 @@
+import sys
 import oauth2 as oauth
 import urllib2 as urllib
 
-# See assignment1.html instructions or README for how to get these credentials
-
-api_key = "8kSvCLEbMcHWnvROGRHEvQrhb"
-api_secret = "1T1K5LFX7CKXD1wSmyvTF9M4oCT1d1O4xVOFCpa2LrjNlcnci0"
-access_token_key = "261933069-eU6jmpibqj2bWUVFuYZxxvcmjOzgycJAVHsg34qk"
-access_token_secret = "x4Pat3wZ0hmSfentItuntXKZ48CzDUcsccjYrYt9FCJaC"
+api_key = sys.argv[1]
+api_secret = sys.argv[2]
+access_token_key = sys.argv[3]
+access_token_secret = sys.argv[4]
 
 _debug = 0
 
