@@ -57,5 +57,8 @@ docs/_build/
 # PyBuilder
 target/
 
-# Data files
+# Project files
 output.txt
+api_key.txt
+api_key_backup.txt
+output_long.txt
