@@ -115,17 +115,27 @@ def calc_score(text, scores):
         score += scores[word] if word in scores else 0
     return score
 
-def assign_sent(tweet_data, scores):
+def calc_state_sents(tweet_data, scores, state_bounds):
     """
-    For each tweet, prints the sentiment score for each tweet to a file.
+    Loops through the twitter data, and for each tweet for which a location
+    can be determined, adds the sentiment score of the happiness total of that
+    state and increments the total number of tweets.
     """
-    outfile = open('tweet_sentiment_scores.txt', 'w')
+    # Initialize all states to have a sentiment score of 0
+    state_sentiments = {}
+    for state in STATE_ABBRV.keys():
+        state_sentiments[state] = [0, 0]
     for tweet in tweet_data:
-        if 'text' in tweet:
-            outfile.write(str(calc_score(tweet['text'], scores)) + "\n")
-        else:
-            outfile.write(str(0) + "\n")
-    outfile.close()
+        if 'text' in tweet and 'coordinates' in tweet:
+            if tweet['coordinates'] is not None:
+                lat = tweet['coordinates']['coordinates'][1]
+                lng = tweet['coordinates']['coordinates'][0]
+                state, found = state_from_point(lat, lng, state_bounds)
+                if found:
+                    text = tweet['text']
+                    state_sentiments[state][0] += calc_score(text, scores)
+                    state_sentiments[state][1] += 1
+    return state_sentiments
 
 def main():
     sent_file = open(sys.argv[1])
@@ -144,10 +154,23 @@ def main():
         tweet_data.append(json.loads(line))
     tweet_file.close()
 
-    assign_sent(tweet_data, scores)
-
     # Read in state boundary information
     state_bounds = read_state_bounds()
+
+    # Calculate the sentiment score for each state
+    state_sentiments = calc_state_sents(tweet_data, scores, state_bounds)
+
+    # Print the average sentiment score for each state
+    total_count = 0
+    print "State / Total sentiment score / Number of tweets / Average sentiment score"
+    for state, data in state_sentiments.iteritems():
+        total = data[0]
+        count = data[1]
+        avg = float(total)/count if count > 0 else 0
+        total_count += count
+        print "{:s} {:4d} {:3d} {:5.2f}".format(STATE_ABBRV[state],
+                                                total, count, avg)
+    print "Total tweets: ", total_count
 
 if __name__ == '__main__':
     main()
