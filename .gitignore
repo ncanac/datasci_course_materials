@@ -58,7 +58,6 @@ docs/_build/
 target/
 
 # Project files
-output.txt
+output*.txt
 api_key.txt
 api_key_backup.txt
-output_long.txt
